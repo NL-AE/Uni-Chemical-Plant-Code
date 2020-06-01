@@ -6,10 +6,10 @@
     #include <Wire.h> 
     
   // Display Declecation
-    Adafruit_TFTLCD tft(A3, A2, A1, A0, A4);
-    TouchScreen ts = TouchScreen(8, A3, A2, 9, 300);
+    Adafruit_TFTLCD tft(A3, A2, A1, A0, A4);            // Pins for TFT 
+    TouchScreen ts = TouchScreen(8, A3, A2, 9, 300);    // Pins for Touchscreen
 
-    #define TimeToDeselect 3000
+    #define TimeToDeselect 3000     // Miliseconds for when it deselects
     long TimeWhenTouched;
     int SetTemp = 15.0;
 
@@ -22,17 +22,16 @@
     #define N  0x0000  // Black
 
   // Misc Variables
-    long ColourState[8]  = {0, 0, 0, 0, 0, 0, 0, 0};
+    long ColourState[8]  = {0,0,0,0,0,0,0,0};   // Stores the colour state of all clickable things
 
-  // Setup
+  // Setup --------------------------------------------------------------
     void setup() {
       Serial.begin(115200);   // Start serial       
       Wire.begin();           // Begin as master
-      SetupDisplay();         // Setup display and also draws pumps for first time
+      SetupDisplay();         // What do you think it does dumbass (Setup display and also draws everything for first time)
     }
 
-
-  // Loop
+  // Loop ---------------------------------------------------------------
     void loop() {
 
       // Get touchpoint
@@ -40,40 +39,40 @@
         pinMode(A2, OUTPUT);
         pinMode(A3, OUTPUT);
 
-      // If user inpur
+      // If user touches screen
         if(p.z > 10){
-          int XPos = map(p.y, 80,890,320,  0);
-          int YPos = map(p.x,110,910,  0,240);
+          int XPos = map(p.y, 80,890,320,  0);  // Map x
+          int YPos = map(p.x,110,910,  0,240);  // Map y
           
           tft.setTextColor(W,N);  tft.setTextSize(1);  tft.setCursor(20,187);  
   
-          // Find Selected
+          // Find where the user selected - im only going to comment one of these since the only thing that changes between them is the co-ordinates and the array number
             if( XPos> 13 && XPos< 55 && YPos> 57 && YPos< 99){  // H2O -> Reactor pump
-              tft.print(F("H2O -> Reactor Pump "));
-              TimeWhenTouched = millis();              
-                ColourState[0]++;           // Increment counter and check if divisible by 2,  
-                if(ColourState[0]%2 == 1){
-                  DrawHtR(G);
-                }else{
-                  DrawHtR(R);
-                }
               
+              tft.print(F("H2O -> Reactor Pump ")); // Print what thing you selected
+              TimeWhenTouched = millis();
+              
+                ColourState[0]++;           // Increment touch counter                
+                if(ColourState[0]%2 == 1){  // Check if divisible by two
+                  DrawHtR(G);                 // No, change it to green
+                }else{
+                  DrawHtR(R);                 // Yes, change it back to red
+                }              
             }
             if( XPos>141 && XPos<183 && YPos> 34 && YPos< 76){  // Reactor -> CO2 pump
               tft.print(F("Reactor -> CO2 Pump "));
               TimeWhenTouched = millis();
-                ColourState[1]++;           // Increment counter and check if divisible by 2,  
+                ColourState[1]++;
                 if(ColourState[1]%2 == 1){
                   DrawRtC(G);
                 }else{
                   DrawRtC(R);
-                }
-              
+                }              
             }
             if( XPos>233 && XPos<275 && YPos> 14 && YPos< 56){  // H2O -> CO2 pump
               tft.print(F("H2O -> CO2 Pump     "));
               TimeWhenTouched = millis();
-                ColourState[2]++;           // Increment counter and check if divisible by 2,  
+                ColourState[2]++;
                 if(ColourState[2]%2 == 1){
                   DrawHtC(G);
                 }else{
@@ -83,7 +82,7 @@
             if( XPos>233 && XPos<275 && YPos> 54 && YPos< 96){  // CO2 -> H2O pump
               tft.print(F("CO2 -> H2O Pump     "));
               TimeWhenTouched = millis();
-                ColourState[3]++;           // Increment counter and check if divisible by 2,  
+                ColourState[3]++;
                 if(ColourState[3]%2 == 1){
                   DrawCtH(G);
                 }else{
@@ -93,7 +92,7 @@
             if( XPos>216 && XPos<258 && YPos>125 && YPos<167){  // Reactor -> Products
               tft.print(F("React. -> Prod. Pump"));
               TimeWhenTouched = millis();
-                ColourState[4]++;           // Increment counter and check if divisible by 2,  
+                ColourState[4]++;
                 if(ColourState[4]%2 == 1){
                   DrawRtP(G);
                 }else{
@@ -103,7 +102,7 @@
             if( XPos> 30 && XPos< 98 && YPos>  7 && YPos< 36){  // L Screw Feed
               tft.print(F("L Screw Feed        "));
               TimeWhenTouched = millis();
-                ColourState[5]++;           // Increment counter and check if divisible by 2,  
+                ColourState[5]++;
                 if(ColourState[5]%2 == 1){
                   DrawSFL(G);
                 }else{
@@ -113,7 +112,7 @@
             if( XPos> 99 && XPos<166 && YPos>  7 && YPos< 36){  // R Screw Feed
               tft.print(F("R Screw Feed        "));
               TimeWhenTouched = millis();
-                ColourState[6]++;           // Increment counter and check if divisible by 2,  
+                ColourState[6]++;
                 if(ColourState[6]%2 == 1){
                   DrawSFR(G);
                 }else{
@@ -123,35 +122,37 @@
             if( XPos> 69 && XPos<139 && YPos>163 && YPos<192){  // Mag Stirrer
               tft.print(F("Magnetic Stirrer    "));
               TimeWhenTouched = millis();
-                ColourState[7]++;           // Increment counter and check if divisible by 2,  
+                ColourState[7]++;
                 if(ColourState[7]%2 == 1){
                   DrawMS(G);
                 }else{
                   DrawMS(R);
                 }
             }
+
+            // This one draws a draggable slider
             if( XPos> 17 && XPos<222 && YPos>205 && YPos<230){  // Set temperature
               tft.print(F("Changing Set Temp   "));
               TimeWhenTouched = millis();
 
               // Draw Slider
                 tft.fillRoundRect( 18,206,192, 23, 3, N);                 // Black Background
-                int sliderX = constrain(map(p.y, 80,890,320,0),19,195);   // Constrain and map touch X co-ord              
+                int sliderX = constrain(map(p.y, 80,890,320,0),19,195);   // Constrain and map touch X co-ord
                 tft.fillRoundRect(sliderX,206, 15, 23, 3, GR);            // Move Slider
 
               // Set Temperature
-                SetTemp = map(sliderX,19,195,15,60);          // Map slider position to set temp
+                SetTemp = map(sliderX,19,195,15,60);          // Map slider position to set temp between 15C and 60C
                 tft.setTextColor(W,N);  tft.setTextSize(2);
-                tft.setCursor(69,90); tft.print(SetTemp);     // Set T
+                tft.setCursor(69,90); tft.print(SetTemp);     // Print the set temperature
             }
 
             // Now Send I2C Data
-              Wire.beginTransmission(9);        // Send to slave 9
+              Wire.beginTransmission(9);        // Send to slave with address 9
               for(int i=0; i<8; i++){
-                Wire.write(ColourState[i]%2);   // Send 8 data
+                Wire.write(ColourState[i]%2);   // Send the colour of all the selectables by accessing the precious array
               }
-              Wire.write(SetTemp);              // Send 
-              Wire.endTransmission();
+              Wire.write(SetTemp);              // Send the set temperature
+              Wire.endTransmission();           // End transmission
         }
 
       // Deselect
@@ -161,34 +162,34 @@
           }
 
       // I2C Request
-        Wire.requestFrom(9,4);    // Request 3 bytes from slave 9
+        Wire.requestFrom(9,4);    // Request 3 bytes from slave with address 9
   
         String InResponse = "";       // String for entire response
         String RawTempStr = "";       // String for raw temp
         String HeaterStatChar = "";   // String for heater status
         
-        while (Wire.available()) {    // When data
+        while (Wire.available()) {    // When data avaliable, read data
             char b = Wire.read();
             InResponse += b;
         } 
         
-        RawTempStr = InResponse.substring(0,3);     // Split string
-        HeaterStatChar = InResponse.substring(3);   // Split string
+        RawTempStr = InResponse.substring(0,3);     // Split string to isolate the raw temperature reading
+        HeaterStatChar = InResponse.substring(3);   // Split string to isolate the heater status
         
-        float RawTemp = RawTempStr.toInt()/10.;     // Convert to float
+        float RawTemp = RawTempStr.toInt()/10.;     // Convert to float (since the data we got it in was something like 456 which is 45.6C)
         int HeaterStat = HeaterStatChar.toInt();    // Convert to int
       
       // Draw Temperature Displays
         tft.setTextColor(W,N);  tft.setTextSize(2);
-        tft.setCursor(69,120);  tft.print(RawTemp,1);     // Raw T
+        tft.setCursor(69,120);  tft.print(RawTemp,1);     // Print raw temperature
         if(HeaterStat == 1){
-          DrawEH(G);
+          DrawEH(G);          // If heater is on, make it green
         }else{
-          DrawEH(R);
+          DrawEH(R);          // If heater is off, make it red (I know this is counter-intuitive but got to remain consistent)
         }
     }
 
-  // Draw Functions
+  // Draw Functions - dont even bother looking down here ----------------
     void SetupDisplay(){   // Setup
       // Commands
         tft.reset();          // Initialise Display
@@ -369,7 +370,6 @@
       tft.drawLine(195,134,195,154, RtP); // Top Bottom Connector     R  
       tft.drawLine(218,144,195,144, RtP); // Connector to splitter    R 
     }
-
     void DrawSFL(uint16_t SFL){   // Left Screw Feed
       tft.drawLine( 45, 28, 90, 28, SFL); // Bottom
       tft.drawLine( 53, 21, 90, 21, SFL); // Top
@@ -425,7 +425,6 @@
 
 
 
-  // aa
 
 
-  
+  // --------------------------------------------------------------------
