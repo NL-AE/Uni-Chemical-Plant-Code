@@ -28,7 +28,7 @@
     void setup() {
       Serial.begin(115200);   // Start serial       
       Wire.begin();           // Begin as master
-      SetupDisplay();         // What do you think it does dumbass (Setup display and also draws everything for first time)
+      SetupDisplay();         // Setup display and also draws everything for first time
     }
 
   // Loop ---------------------------------------------------------------

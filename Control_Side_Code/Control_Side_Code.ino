@@ -1,25 +1,34 @@
 
   // Libraries
-    #include <Wire.h>
-    #include <OneWire.h>
-    #include <DallasTemperature.h>    
+    #include <Wire.h>                 // Wire for I2C
+    #include <OneWire.h>              // For temp sensor
+    #include <DallasTemperature.h>    // For temp sensor
+    #define SOFTPWM_OUTPUT_DELAY      // Soft output for software PWM
+    #include <PalatisSoftPWM.h>       // For Software PWM
 
   // Setup sensor
     #define ONE_WIRE_BUS 11               // Attach sensor to pin 11
-    OneWire oneWire(ONE_WIRE_BUS);        // I dunno what this does but it works
-    DallasTemperature sensors(&oneWire);  // dunno either
+    OneWire oneWire(ONE_WIRE_BUS);
+    DallasTemperature sensors(&oneWire);
 
+  // I2C Variables
     char responseChar[5];   // Response String for I2C to display master
     int SetTemp;            // Store what the set temperature is
     
   // Define Pins    
-    int pinArray[9] = {3,4,5,6,7,8,9,2,10}; // Pins for:  HtR, RtC, HtC, CtH, RtP, SFL, SFR, MS, EH
-    int ActivePins[8] = {0,0,0,0,0,0,0,0};  // Status of: HtR, RtC, HtC, CtH, RtP, SFL, SFR, MS
+    int pinArray[9] = {3,4,5,6,7,8,9,2,10};   // Pins for:  HtR, RtC, HtC, CtH, RtP, SFL, SFR, MS, EH
+    int ActivePins[8] = {0,0,0,0,0,0,0,0};    // Status of: HtR, RtC, HtC, CtH, RtP, SFL, SFR, MS
+
+    SOFTPWM_DEFINE_PIN2_CHANNEL(0);                 // Make pin 2 PWM channel 0
+    SOFTPWM_DEFINE_OBJECT_WITH_PWM_LEVELS(1, 10);   // For 1 PWM channels, make them have 10 levels
+    
 
   // Setup --------------------------------------------------------------
     void setup() {
       Serial.begin(115200);   // Serial begin
       sensors.begin();        // Setup temperature sensor
+
+      PalatisSoftPWM.begin(60);  // begin with 60 Hz PWM frequency
   
       for(int i=0; i<9; i++){          // For loop (9 times)
         pinMode(pinArray[i],OUTPUT);      // Initialise pin as output
@@ -46,8 +55,14 @@
         HeaterStatus = 0;
       }
 
-      for(int i=0; i<8; i++){
+      for(int i=0; i<7; i++){
         digitalWrite(pinArray[i],ActivePins[i]);    // Write to all pins correct states
+      }
+
+      if(ActivePins[7]==1){
+        PalatisSoftPWM.set(0, 9);
+      }else{
+        PalatisSoftPWM.set(0, 0);
       }
       
       String response = String(RawTemp) + String(HeaterStatus);   // Create response string (sending in format of: 4501 which means read temperature is 45.0C and heater is on)
