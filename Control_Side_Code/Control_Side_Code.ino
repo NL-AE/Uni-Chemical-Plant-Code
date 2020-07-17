@@ -13,7 +13,7 @@
 
   // I2C Variables
     char responseChar[5];   // Response String for I2C to display master
-    int SetTemp;            // Store what the set temperature is
+    int SetTemp = 150;            // Store what the set temperature is
     
   // Define Pins    
     int pinArray[9] = {3,4,5,6,7,8,9,2,10};   // Pins for:  HtR, RtC, HtC, CtH, RtP, SFL, SFR, MS, EH
